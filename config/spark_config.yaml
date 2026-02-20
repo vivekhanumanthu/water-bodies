@@ -1,0 +1,23 @@
+app:
+  name: traffic-crashes-etl
+  master: local[*]
+  deploy_mode: client
+
+spark:
+  sql_shuffle_partitions: 200
+  serializer: org.apache.spark.serializer.KryoSerializer
+  adaptive_enabled: true
+
+resources:
+  executors: 2
+  cores_per_executor: 2
+  executor_memory: 4g
+
+paths:
+  raw_input: data/raw/json_chunks
+  curated_output: data/processed/crashes_clean
+  reports_output: reports
+
+notes:
+  partition_strategy: "partition by crash_year, crash_month for temporal queries"
+  storage_format: "Parquet for columnar pruning and compression"

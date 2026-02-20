@@ -1,0 +1,9 @@
+name: traffic-crashes
+channels:
+  - conda-forge
+dependencies:
+  - openjdk=17
+  - python=3.11
+  - pip
+  - pip:
+      - -r requirements.txt

@@ -1,0 +1,30 @@
+{
+  "project_name": "Chicago Traffic Crashes - Big Data Analytics",
+  "data_source_folder": "../reports",
+  "dashboards": [
+    {
+      "name": "Dashboard 1 - Data Quality & Pipeline Monitoring",
+      "file": "dashboard1.twbx",
+      "focus": ["data_quality_summary", "pipeline_lineage", "ingestion_volume"]
+    },
+    {
+      "name": "Dashboard 2 - Model Performance & Feature Importance",
+      "file": "dashboard2.twbx",
+      "focus": ["mllib_model_comparison", "sklearn_baseline", "feature_importance"]
+    },
+    {
+      "name": "Dashboard 3 - Business Insights & Recommendations",
+      "file": "dashboard3.twbx",
+      "focus": ["top_primary_causes", "monthly_trends", "risk_bands"]
+    },
+    {
+      "name": "Dashboard 4 - Scalability & Cost Analysis",
+      "file": "dashboard4.twbx",
+      "focus": ["scaling_strong", "scaling_weak", "cost_performance"]
+    }
+  ],
+  "interactive_controls": {
+    "parameters": ["year_range", "weather_filter", "model_selector"],
+    "lod_examples": ["{FIXED [crash_ym]: SUM([crashes])}"]
+  }
+}
