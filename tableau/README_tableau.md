@@ -1,5 +1,8 @@
 # Tableau Visualization Strategy
 
+Detailed implementation steps (including setup) are in:
+- `tableau/BUILD_STEPS.md`
+
 ## Dashboard 1: Data Quality and Pipeline Monitoring
 - Data quality metrics from `reports/data_quality_summary.csv`
 - Pipeline lineage status from `reports/pipeline_lineage.jsonl`

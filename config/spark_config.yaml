@@ -7,6 +7,10 @@ spark:
   sql_shuffle_partitions: 200
   serializer: org.apache.spark.serializer.KryoSerializer
   adaptive_enabled: true
+  ui_port: 4040
+  ui_port_retries: 20
+  driver_bind_address: 127.0.0.1
+  driver_host: 127.0.0.1
 
 resources:
   executors: 2

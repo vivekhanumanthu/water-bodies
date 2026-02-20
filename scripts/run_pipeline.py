@@ -24,6 +24,7 @@ from pyspark.ml import Pipeline, Transformer
 from pyspark.ml.classification import GBTClassifier, LogisticRegression, RandomForestClassifier
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
 from pyspark.ml.feature import OneHotEncoder, StringIndexer, VectorAssembler
+from pyspark.ml.functions import vector_to_array
 from pyspark.ml.param.shared import Param, Params, TypeConverters
 from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
 from pyspark.ml.util import DefaultParamsReadable, DefaultParamsWritable
@@ -128,7 +129,7 @@ def log_lineage(lineage_path: Path, step: str, status: str, details: dict[str, A
     payload = {
         "step": step,
         "status": status,
-        "timestamp_utc": pd.Timestamp.utcnow().isoformat(),
+        "timestamp_utc": pd.Timestamp.now("UTC").isoformat(),
         "details": details,
     }
     with lineage_path.open("a", encoding="utf-8") as handle:
@@ -232,6 +233,12 @@ def create_spark_session(base_dir: Path, config_path: Path) -> SparkSession:
     builder = builder.config("spark.executor.instances", str(res_cfg.get("executors", 2)))
     builder = builder.config("spark.executor.cores", str(res_cfg.get("cores_per_executor", 2)))
     builder = builder.config("spark.executor.memory", res_cfg.get("executor_memory", "4g"))
+    # Make Spark UI reachable on local development machines.
+    builder = builder.config("spark.ui.enabled", "true")
+    builder = builder.config("spark.ui.port", str(spark_cfg.get("ui_port", 4040)))
+    builder = builder.config("spark.port.maxRetries", str(spark_cfg.get("ui_port_retries", 20)))
+    builder = builder.config("spark.driver.bindAddress", spark_cfg.get("driver_bind_address", "127.0.0.1"))
+    builder = builder.config("spark.driver.host", spark_cfg.get("driver_host", "127.0.0.1"))
 
     spark = builder.getOrCreate()
     spark.sparkContext.setCheckpointDir(str(base_dir / "data" / "processed" / "spark_checkpoints"))
@@ -522,7 +529,10 @@ def run_mllib_experiments(
         test_roc = evaluator_roc.evaluate(test_pred)
         test_pr = evaluator_pr.evaluate(test_pred)
 
-        pred_pd = test_pred.select(F.col("label").cast("int").alias("label"), F.col("probability")[1].alias("score")).toPandas()
+        pred_pd = test_pred.select(
+            F.col("label").cast("int").alias("label"),
+            vector_to_array(F.col("probability"))[1].alias("score"),
+        ).toPandas()
         ci_low, ci_high = bootstrap_auc_ci(pred_pd["label"], pred_pd["score"], n_bootstrap=200)
 
         expected_cost_avoided = float(pred_pd["score"].mean() * 1000.0)

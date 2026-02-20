@@ -69,6 +69,24 @@ Scalability experiments:
 python scripts/performance_profiler.py --partitions 2,4,8 --fixed-rows 300000 --rows-per-partition 100000
 ```
 
+Naive vs optimized comparison (same task, different implementation):
+```bash
+python scripts/pipeline_naive.py --max-rows 150000
+python scripts/pipeline_opt.py --max-rows 150000
+```
+
+Or run both in one command:
+```bash
+python scripts/pipeline_compare_modes.py --mode both --max-rows 150000
+```
+
+Comparison outputs:
+- `reports/comparison/comparison_runtime.csv`
+- `reports/comparison/naive/plan_transform.txt`
+- `reports/comparison/optimized/plan_transform.txt`
+- `reports/comparison/naive/*.csv`
+- `reports/comparison/optimized/*.csv`
+
 ## Requirement Mapping
 
 ### 1) PySpark Data Engineering
