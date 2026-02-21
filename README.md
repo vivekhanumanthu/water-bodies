@@ -133,6 +133,9 @@ Include screenshots of:
 - stage DAG for joins/shuffles
 - executor/storage tabs to justify caching decisions
 
+## Evaluation Evidence
+- See `docs/EVALUATION_SUPPORT.md` for requirement-to-implementation mapping and evidence lines.
+
 ## Tests
 
 ```bash

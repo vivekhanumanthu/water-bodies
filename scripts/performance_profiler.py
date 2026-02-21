@@ -5,13 +5,17 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 import time
 from pathlib import Path
 
 import pandas as pd
 from pyspark.sql import functions as F
 
-from scripts.run_pipeline import create_spark_session, ensure_dirs
+if __package__ is None or __package__ == "":
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+
+from scripts.run_pipeline import create_spark_session, ensure_dirs  # type: ignore
 
 
 def timed_aggregation(df) -> float:
