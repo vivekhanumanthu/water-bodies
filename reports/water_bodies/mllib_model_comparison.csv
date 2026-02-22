@@ -1,0 +1,4 @@
+model,val_roc_auc,test_roc_auc,test_pr_auc,auc_ci_low,auc_ci_high,train_seconds,expected_profit_index,test_rows
+logistic_regression,1.0,1.0,1.0,1.0,1.0,6.598642083001323,884400.0,2266
+random_forest,1.0,1.0,1.0,1.0,1.0,8.354051166999852,884400.0,2266
+gbt,1.0,1.0,1.0,1.0,1.0,24.533405708003556,884400.0,2266

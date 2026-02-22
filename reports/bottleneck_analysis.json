@@ -1,6 +1,0 @@
-{
-  "likely_io_bound_when": "rows_per_second does not improve with more partitions",
-  "likely_shuffle_bound_when": "strong scaling speedup flattens after partition increases",
-  "likely_compute_bound_when": "CPU saturation observed with high executor utilization",
-  "spark_ui_screenshot_path": "/Users/vivekhanumanthu/Desktop/big data assn 1/reports/spark_ui"
-}

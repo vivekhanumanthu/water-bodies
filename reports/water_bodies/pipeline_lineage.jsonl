@@ -1,0 +1,5 @@
+{"step": "resolve_resource", "status": "ok", "timestamp_utc": "2026-02-22T08:09:50.037902+00:00", "details": {"resolved_url": "https://data-wake.opendata.arcgis.com/api/download/v1/items/833ea31f01a04020bc154e90bf9f1f41/csv?layers=0"}}
+{"step": "download", "status": "ok", "timestamp_utc": "2026-02-22T08:09:52.503490+00:00", "details": {"source_path": "/Users/vivekhanumanthu/Desktop/big data assn 1/data/raw/water_bodies/water_bodies_source.csv"}}
+{"step": "transform", "status": "ok", "timestamp_utc": "2026-02-22T08:09:58.256051+00:00", "details": {"output": "/Users/vivekhanumanthu/Desktop/big data assn 1/data/processed/water_bodies/curated"}}
+{"step": "mllib", "status": "ok", "timestamp_utc": "2026-02-22T08:10:44.751974+00:00", "details": {"output": "/Users/vivekhanumanthu/Desktop/big data assn 1/reports/water_bodies/mllib_model_comparison.csv"}}
+{"step": "pipeline_complete", "status": "ok", "timestamp_utc": "2026-02-22T08:10:44.756339+00:00", "details": {"rows": 15103, "run_ml": true}}

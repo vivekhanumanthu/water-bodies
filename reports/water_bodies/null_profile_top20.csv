@@ -1,0 +1,13 @@
+column,null_count,null_ratio
+DWQREVIEW,15101,0.9998675759782825
+NAME,8379,0.554790438985632
+HYDRO_TYPE,2382,0.15771700986558962
+quality_band,0,0.0
+OBJECTID,0,0.0
+non_empty_fields,0,0.0
+completeness_ratio,0,0.0
+name_length,0,0.0
+ingested_at,0,0.0
+ingest_year,0,0.0
+ingest_month,0,0.0
+min_ratio,0,0.0

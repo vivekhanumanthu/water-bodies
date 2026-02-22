@@ -1,0 +1,13 @@
+column,data_type,non_null_count,null_count,fill_rate,distinct_count
+OBJECTID,int,15103,0,1.0,14991
+NAME,string,15103,0,1.0,106
+name_length,int,15103,0,1.0,16
+HYDRO_TYPE,string,15103,0,1.0,10
+non_empty_fields,int,15103,0,1.0,4
+completeness_ratio,double,15103,0,1.0,4
+quality_band,string,15103,0,1.0,3
+min_ratio,double,15103,0,1.0,3
+ingested_at,timestamp,15103,0,1.0,1
+ingest_year,int,15103,0,1.0,1
+ingest_month,int,15103,0,1.0,1
+DWQREVIEW,string,2,15101,0.00013242402171753957,1

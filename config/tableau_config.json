@@ -1,30 +1,30 @@
 {
-  "project_name": "Chicago Traffic Crashes - Big Data Analytics",
-  "data_source_folder": "../reports",
+  "project_name": "Water Bodies Analytics",
+  "data_source_folder": "../reports/water_bodies",
   "dashboards": [
     {
       "name": "Dashboard 1 - Data Quality & Pipeline Monitoring",
       "file": "dashboard1.twbx",
-      "focus": ["data_quality_summary", "pipeline_lineage", "ingestion_volume"]
+      "focus": ["dataset_profile", "null_profile", "pipeline_lineage"]
     },
     {
-      "name": "Dashboard 2 - Model Performance & Feature Importance",
+      "name": "Dashboard 2 - Distribution Overview",
       "file": "dashboard2.twbx",
-      "focus": ["mllib_model_comparison", "sklearn_baseline", "feature_importance"]
+      "focus": ["geometry_distribution", "summary_totals"]
     },
     {
-      "name": "Dashboard 3 - Business Insights & Recommendations",
+      "name": "Dashboard 3 - Data Completeness & Samples",
       "file": "dashboard3.twbx",
-      "focus": ["top_primary_causes", "monthly_trends", "risk_bands"]
+      "focus": ["null_profile", "sample_records"]
     },
     {
-      "name": "Dashboard 4 - Scalability & Cost Analysis",
+      "name": "Dashboard 4 - Operational Monitoring",
       "file": "dashboard4.twbx",
-      "focus": ["scaling_strong", "scaling_weak", "cost_performance"]
+      "focus": ["pipeline_status", "refresh_tracking"]
     }
   ],
   "interactive_controls": {
-    "parameters": ["year_range", "weather_filter", "model_selector"],
-    "lod_examples": ["{FIXED [crash_ym]: SUM([crashes])}"]
+    "parameters": ["column_selector", "null_ratio_threshold"],
+    "lod_examples": ["{FIXED [column]: AVG([null_ratio])}"]
   }
 }

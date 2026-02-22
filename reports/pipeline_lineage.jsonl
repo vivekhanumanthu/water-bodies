@@ -1,7 +1,0 @@
-{"step": "ingestion_start", "status": "ok", "timestamp_utc": "2026-02-20T18:59:15.531574+00:00", "details": {"chunk_size": 50000, "max_rows": 300000}}
-{"step": "ingestion_complete", "status": "ok", "timestamp_utc": "2026-02-20T19:01:14.690140+00:00", "details": {"total_rows": 300000, "chunks": 6}}
-{"step": "validation", "status": "ok", "timestamp_utc": "2026-02-20T19:01:21.328772+00:00", "details": {"total_rows": 300000, "invalid_rows": 0, "valid_rows": 300000}}
-{"step": "feature_engineering", "status": "ok", "timestamp_utc": "2026-02-20T19:01:25.422209+00:00", "details": {"output": "/Users/vivekhanumanthu/Desktop/big data assn 1/data/processed/crashes_clean", "partition_cols": ["crash_year", "crash_month"], "format": "parquet"}}
-{"step": "analytics", "status": "ok", "timestamp_utc": "2026-02-20T19:01:29.276932+00:00", "details": {"outputs": ["summary_totals.csv", "crashes_by_month.csv"]}}
-{"step": "mllib_training", "status": "ok", "timestamp_utc": "2026-02-20T19:04:32.868995+00:00", "details": {"models": ["logistic_regression", "random_forest", "gbt"], "temporal_split": {"train_end_epoch": 1533322620.0, "val_end_epoch": 1545480240.0}}}
-{"step": "pipeline_complete", "status": "ok", "timestamp_utc": "2026-02-20T19:04:34.405552+00:00", "details": {"skip_ml": false}}

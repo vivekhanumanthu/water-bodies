@@ -1,0 +1,2 @@
+model,roc_auc_train_sample,rows
+sklearn_logistic,1.0,15103

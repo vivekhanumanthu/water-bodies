@@ -1,0 +1,38 @@
+{
+  "dataset_page": "https://catalog.data.gov/dataset/water-bodies-07739",
+  "ingestion_mode": "resolve Data.gov resource URL via package_show API, then Spark read with CSV/GeoJSON/JSON fallback",
+  "derived_columns": [
+    "ingested_at",
+    "ingest_year",
+    "ingest_month",
+    "geometry_type",
+    "non_empty_fields",
+    "completeness_ratio",
+    "name_length",
+    "quality_band",
+    "label",
+    "event_order"
+  ],
+  "storage_design": {
+    "format": "parquet",
+    "partition_by": ["ingest_year", "ingest_month"]
+  },
+  "ml_models": [
+    "logistic_regression",
+    "random_forest",
+    "gbt",
+    "sklearn_logistic_baseline"
+  ],
+  "reports": [
+    "reports/water_bodies/summary_totals.csv",
+    "reports/water_bodies/dataset_profile.csv",
+    "reports/water_bodies/ingestion_validation.csv",
+    "reports/water_bodies/null_profile_top20.csv",
+    "reports/water_bodies/column_inventory.csv",
+    "reports/water_bodies/numeric_statistics.csv",
+    "reports/water_bodies/top_values_by_column.csv",
+    "reports/water_bodies/mllib_model_comparison.csv",
+    "reports/water_bodies/sklearn_baseline.csv",
+    "reports/water_bodies/scaling_cost_performance.csv"
+  ]
+}

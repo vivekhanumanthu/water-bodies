@@ -1,10 +1,10 @@
 app:
-  name: traffic-crashes-etl
+  name: water-bodies-etl
   master: local[*]
   deploy_mode: client
 
 spark:
-  sql_shuffle_partitions: 200
+  sql_shuffle_partitions: 120
   serializer: org.apache.spark.serializer.KryoSerializer
   adaptive_enabled: true
   ui_port: 4040
@@ -18,10 +18,10 @@ resources:
   executor_memory: 4g
 
 paths:
-  raw_input: data/raw/json_chunks
-  curated_output: data/processed/crashes_clean
-  reports_output: reports
+  raw_input: data/raw/water_bodies
+  curated_output: data/processed/water_bodies/curated
+  reports_output: reports/water_bodies
 
 notes:
-  partition_strategy: "partition by crash_year, crash_month for temporal queries"
-  storage_format: "Parquet for columnar pruning and compression"
+  partition_strategy: "partition by ingest_year, ingest_month for snapshot and refresh analysis"
+  storage_format: "Parquet for columnar scans and compression"

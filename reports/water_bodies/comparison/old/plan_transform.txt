@@ -1,0 +1,48 @@
+== Parsed Logical Plan ==
+'Join UsingJoin(LeftOuter, [quality_band])
+:- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, ingested_at#44, ingest_year#45, ingest_month#46, non_empty_fields#47, completeness_ratio#48, CASE WHEN (completeness_ratio#48 >= 0.85) THEN HIGH WHEN (completeness_ratio#48 >= 0.6) THEN MEDIUM ELSE LOW END AS quality_band#49]
+:  +- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, ingested_at#44, ingest_year#45, ingest_month#46, non_empty_fields#47, (cast(non_empty_fields#47 as double) / cast(4.0 as double)) AS completeness_ratio#48]
+:     +- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, ingested_at#44, ingest_year#45, ingest_month#46, (((CASE WHEN (isnull(OBJECTID#17) OR (trim(cast(OBJECTID#17 as string), None) = )) THEN 0 ELSE 1 END + CASE WHEN (isnull(HYDRO_TYPE#18) OR (trim(cast(HYDRO_TYPE#18 as string), None) = )) THEN 0 ELSE 1 END) + CASE WHEN (isnull(NAME#19) OR (trim(cast(NAME#19 as string), None) = )) THEN 0 ELSE 1 END) + CASE WHEN (isnull(DWQREVIEW#20) OR (trim(cast(DWQREVIEW#20 as string), None) = )) THEN 0 ELSE 1 END) AS non_empty_fields#47]
+:        +- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, ingested_at#44, ingest_year#45, month(cast(ingested_at#44 as date)) AS ingest_month#46]
+:           +- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, ingested_at#44, year(cast(ingested_at#44 as date)) AS ingest_year#45]
+:              +- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, current_timestamp() AS ingested_at#44]
+:                 +- Relation [OBJECTID#17,HYDRO_TYPE#18,NAME#19,DWQREVIEW#20] csv
++- LogicalRDD [quality_band#50, min_ratio#51], false
+
+== Analyzed Logical Plan ==
+quality_band: string, OBJECTID: int, HYDRO_TYPE: string, NAME: string, DWQREVIEW: string, ingested_at: timestamp, ingest_year: int, ingest_month: int, non_empty_fields: int, completeness_ratio: double, min_ratio: double
+Project [quality_band#49, OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, ingested_at#44, ingest_year#45, ingest_month#46, non_empty_fields#47, completeness_ratio#48, min_ratio#51]
++- Join LeftOuter, (quality_band#49 = quality_band#50)
+   :- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, ingested_at#44, ingest_year#45, ingest_month#46, non_empty_fields#47, completeness_ratio#48, CASE WHEN (completeness_ratio#48 >= 0.85) THEN HIGH WHEN (completeness_ratio#48 >= 0.6) THEN MEDIUM ELSE LOW END AS quality_band#49]
+   :  +- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, ingested_at#44, ingest_year#45, ingest_month#46, non_empty_fields#47, (cast(non_empty_fields#47 as double) / cast(4.0 as double)) AS completeness_ratio#48]
+   :     +- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, ingested_at#44, ingest_year#45, ingest_month#46, (((CASE WHEN (isnull(OBJECTID#17) OR (trim(cast(OBJECTID#17 as string), None) = )) THEN 0 ELSE 1 END + CASE WHEN (isnull(HYDRO_TYPE#18) OR (trim(cast(HYDRO_TYPE#18 as string), None) = )) THEN 0 ELSE 1 END) + CASE WHEN (isnull(NAME#19) OR (trim(cast(NAME#19 as string), None) = )) THEN 0 ELSE 1 END) + CASE WHEN (isnull(DWQREVIEW#20) OR (trim(cast(DWQREVIEW#20 as string), None) = )) THEN 0 ELSE 1 END) AS non_empty_fields#47]
+   :        +- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, ingested_at#44, ingest_year#45, month(cast(ingested_at#44 as date)) AS ingest_month#46]
+   :           +- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, ingested_at#44, year(cast(ingested_at#44 as date)) AS ingest_year#45]
+   :              +- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, current_timestamp() AS ingested_at#44]
+   :                 +- Relation [OBJECTID#17,HYDRO_TYPE#18,NAME#19,DWQREVIEW#20] csv
+   +- LogicalRDD [quality_band#50, min_ratio#51], false
+
+== Optimized Logical Plan ==
+Project [quality_band#49, OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, 2026-02-22 17:44:54.896779 AS ingested_at#44, 2026 AS ingest_year#45, 2 AS ingest_month#46, non_empty_fields#47, completeness_ratio#48, min_ratio#51]
++- Join LeftOuter, (quality_band#49 = quality_band#50)
+   :- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, non_empty_fields#47, completeness_ratio#48, CASE WHEN (completeness_ratio#48 >= 0.85) THEN HIGH WHEN (completeness_ratio#48 >= 0.6) THEN MEDIUM ELSE LOW END AS quality_band#49]
+   :  +- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, non_empty_fields#47, (cast(non_empty_fields#47 as double) / 4.0) AS completeness_ratio#48]
+   :     +- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, (((CASE WHEN (isnull(OBJECTID#17) OR (trim(cast(OBJECTID#17 as string), None) = )) THEN 0 ELSE 1 END + CASE WHEN (isnull(HYDRO_TYPE#18) OR (trim(HYDRO_TYPE#18, None) = )) THEN 0 ELSE 1 END) + CASE WHEN (isnull(NAME#19) OR (trim(NAME#19, None) = )) THEN 0 ELSE 1 END) + CASE WHEN (isnull(DWQREVIEW#20) OR (trim(DWQREVIEW#20, None) = )) THEN 0 ELSE 1 END) AS non_empty_fields#47]
+   :        +- Relation [OBJECTID#17,HYDRO_TYPE#18,NAME#19,DWQREVIEW#20] csv
+   +- Filter isnotnull(quality_band#50)
+      +- LogicalRDD [quality_band#50, min_ratio#51], false
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Project [quality_band#49, OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, 2026-02-22 17:44:54.896779 AS ingested_at#44, 2026 AS ingest_year#45, 2 AS ingest_month#46, non_empty_fields#47, completeness_ratio#48, min_ratio#51]
+   +- SortMergeJoin [quality_band#49], [quality_band#50], LeftOuter
+      :- Sort [quality_band#49 ASC NULLS FIRST], false, 0
+      :  +- Exchange hashpartitioning(quality_band#49, 120), ENSURE_REQUIREMENTS, [plan_id=297]
+      :     +- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, non_empty_fields#47, completeness_ratio#48, CASE WHEN (completeness_ratio#48 >= 0.85) THEN HIGH WHEN (completeness_ratio#48 >= 0.6) THEN MEDIUM ELSE LOW END AS quality_band#49]
+      :        +- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, non_empty_fields#47, (cast(non_empty_fields#47 as double) / 4.0) AS completeness_ratio#48]
+      :           +- Project [OBJECTID#17, HYDRO_TYPE#18, NAME#19, DWQREVIEW#20, (((CASE WHEN (isnull(OBJECTID#17) OR (trim(cast(OBJECTID#17 as string), None) = )) THEN 0 ELSE 1 END + CASE WHEN (isnull(HYDRO_TYPE#18) OR (trim(HYDRO_TYPE#18, None) = )) THEN 0 ELSE 1 END) + CASE WHEN (isnull(NAME#19) OR (trim(NAME#19, None) = )) THEN 0 ELSE 1 END) + CASE WHEN (isnull(DWQREVIEW#20) OR (trim(DWQREVIEW#20, None) = )) THEN 0 ELSE 1 END) AS non_empty_fields#47]
+      :              +- FileScan csv [OBJECTID#17,HYDRO_TYPE#18,NAME#19,DWQREVIEW#20] Batched: false, DataFilters: [], Format: CSV, Location: InMemoryFileIndex(1 paths)[file:/Users/vivekhanumanthu/Desktop/big data assn 1/data/raw/water_bod..., PartitionFilters: [], PushedFilters: [], ReadSchema: struct<OBJECTID:int,HYDRO_TYPE:string,NAME:string,DWQREVIEW:string>
+      +- Sort [quality_band#50 ASC NULLS FIRST], false, 0
+         +- Exchange hashpartitioning(quality_band#50, 120), ENSURE_REQUIREMENTS, [plan_id=298]
+            +- Filter isnotnull(quality_band#50)
+               +- Scan ExistingRDD[quality_band#50,min_ratio#51]

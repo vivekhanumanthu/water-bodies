@@ -1,0 +1,6 @@
+{
+  "likely_io_bound_when": "rows_per_second plateaus as partitions rise",
+  "likely_shuffle_bound_when": "strong-scaling speedup flattens after higher partition counts",
+  "likely_compute_bound_when": "executor CPU saturation occurs with little throughput gain",
+  "spark_ui_screenshot_path": "/Users/vivekhanumanthu/Desktop/big data assn 1/reports/water_bodies/spark_ui"
+}

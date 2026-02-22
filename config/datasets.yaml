@@ -1,0 +1,5 @@
+datasets:
+  water_bodies:
+    type: ckan_resource
+    catalog_url: https://catalog.data.gov/dataset/water-bodies-07739
+    description: Water bodies dataset from Data.gov
