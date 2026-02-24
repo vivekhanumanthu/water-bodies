@@ -356,7 +356,20 @@ def bootstrap_auc_ci(y_true: pd.Series, y_score: pd.Series, n_bootstrap: int = 2
 
 
 def prepare_ml_data(curated_df: DataFrame) -> tuple[DataFrame, list[str], list[str]]:
-    feature_candidates = [c for c in curated_df.columns if c not in {"ingested_at", "quality_band", "min_ratio"}]
+    leakage_cols = {
+        "ingested_at",
+        "ingest_year",
+        "ingest_month",
+        "quality_band",
+        "min_ratio",
+        "completeness_ratio",
+        "non_empty_fields",
+        "label",
+        "event_order",
+    }
+    feature_candidates = [c for c in curated_df.columns if c not in leakage_cols]
+    feature_candidates = [c for c in feature_candidates if "quality" not in c.lower() and "completeness" not in c.lower()]
+    feature_candidates = [c for c in feature_candidates if not c.lower().endswith("id")]
 
     # Imbalanced label: lowest ~15% completeness considered high-risk quality issue.
     q = curated_df.approxQuantile("completeness_ratio", [0.15], 0.01)
@@ -364,6 +377,17 @@ def prepare_ml_data(curated_df: DataFrame) -> tuple[DataFrame, list[str], list[s
 
     labeled = curated_df.withColumn("label", F.when(F.col("completeness_ratio") <= F.lit(threshold), 1.0).otherwise(0.0))
     labeled = labeled.withColumn("event_order", F.monotonically_increasing_id())
+
+    # Leakage guard: keep columns that are mostly non-missing so label-by-missingness is harder to memorize.
+    if feature_candidates:
+        miss_exprs = [
+            F.avg(F.when(F.col(c).isNull() | (F.trim(F.col(c).cast("string")) == ""), F.lit(1.0)).otherwise(F.lit(0.0))).alias(c)
+            for c in feature_candidates
+        ]
+        miss_ratios = labeled.select(*miss_exprs).collect()[0].asDict()
+        strict = [c for c in feature_candidates if float(miss_ratios.get(c, 1.0)) <= 0.10]
+        relaxed = [c for c in feature_candidates if float(miss_ratios.get(c, 1.0)) <= 0.30]
+        feature_candidates = strict if strict else relaxed
 
     numeric_types = {"tinyint", "smallint", "int", "bigint", "float", "double", "decimal", "long"}
     numeric_cols = [c for c, t in labeled.dtypes if c in feature_candidates and any(t.startswith(n) for n in numeric_types)]
@@ -497,17 +521,29 @@ def run_mllib(curated_df: DataFrame, models_dir: Path, reports_dir: Path, cv_par
     if import_rows:
         pd.DataFrame(import_rows).to_csv(reports_dir / "feature_importance_index.csv", index=False)
 
-    run_sklearn_baseline(ml_df, cat_cols, numeric_cols, models_dir, reports_dir)
+    run_sklearn_baseline(train_df, test_df, cat_cols, numeric_cols, models_dir, reports_dir)
 
 
-def run_sklearn_baseline(ml_df: DataFrame, cat_cols: list[str], numeric_cols: list[str], models_dir: Path, reports_dir: Path) -> None:
-    sample = ml_df.select(*(cat_cols + numeric_cols + ["label"]))
-    pd_df = sample.limit(120_000).toPandas()
-    if pd_df.empty or pd_df["label"].nunique() < 2:
+def run_sklearn_baseline(
+    train_df: DataFrame,
+    test_df: DataFrame,
+    cat_cols: list[str],
+    numeric_cols: list[str],
+    models_dir: Path,
+    reports_dir: Path,
+) -> None:
+    selected_cols = cat_cols + numeric_cols + ["label"]
+    train_pd = train_df.select(*selected_cols).limit(120_000).toPandas()
+    test_pd = test_df.select(*selected_cols).limit(120_000).toPandas()
+    if train_pd.empty or test_pd.empty:
+        return
+    if train_pd["label"].nunique() < 2 or test_pd["label"].nunique() < 2:
         return
 
-    X = pd_df[cat_cols + numeric_cols]
-    y = pd_df["label"].astype(int)
+    X_train = train_pd[cat_cols + numeric_cols]
+    y_train = train_pd["label"].astype(int)
+    X_test = test_pd[cat_cols + numeric_cols]
+    y_test = test_pd["label"].astype(int)
 
     pre = ColumnTransformer(
         transformers=[
@@ -516,15 +552,27 @@ def run_sklearn_baseline(ml_df: DataFrame, cat_cols: list[str], numeric_cols: li
         ]
     )
     model = SkPipeline(steps=[("pre", pre), ("clf", SkLogisticRegression(max_iter=400, class_weight="balanced"))])
-    model.fit(X, y)
+    model.fit(X_train, y_train)
 
-    score = model.predict_proba(X)[:, 1]
-    auc = roc_auc_score(y, score)
+    train_score = model.predict_proba(X_train)[:, 1]
+    test_score = model.predict_proba(X_test)[:, 1]
+    auc_train = roc_auc_score(y_train, train_score)
+    auc_test = roc_auc_score(y_test, test_score)
 
     with (models_dir / "sklearn_baseline.pkl").open("wb") as h:
         pickle.dump(model, h)
 
-    pd.DataFrame([{"model": "sklearn_logistic", "roc_auc_train_sample": float(auc), "rows": len(pd_df)}]).to_csv(
+    pd.DataFrame(
+        [
+            {
+                "model": "sklearn_logistic",
+                "roc_auc_train_sample": float(auc_train),
+                "roc_auc_test_sample": float(auc_test),
+                "train_rows": len(train_pd),
+                "test_rows": len(test_pd),
+            }
+        ]
+    ).to_csv(
         reports_dir / "sklearn_baseline.csv", index=False
     )
 

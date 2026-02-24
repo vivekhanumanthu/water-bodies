@@ -1,95 +1,47 @@
-# Water Bodies Big Data Platform (PySpark + Tableau)
+# Big Data Assignment 1 - Water Bodies Pipeline
 
-Dataset:
-- Water Bodies: https://catalog.data.gov/dataset/water-bodies-07739
+## Project Goal
+Build an end-to-end Spark data platform for the Water Bodies dataset with:
+- ingestion and validation
+- distributed processing and curated outputs
+- ML model training/evaluation
+- scalability and runtime comparison reports
+- Tableau-ready reporting artifacts
 
-## Setup
+## Repository Structure
+- `scripts/`: pipeline runners and profiling/comparison scripts
+- `config/`: Spark + dataset configuration
+- `data/`: raw, processed, and model artifacts
+- `reports/water_bodies/`: generated CSV/JSON reports
+- `tableau/`: Tableau guide and packaged workbooks
 
-```bash
-bash scripts/setup_environment.sh
-source .venv/bin/activate
-```
-
-## Run Full Pipeline (Engineering + ML)
-
-```bash
-python scripts/run_data_platform.py --dataset water_bodies --cv-parallelism 2
-```
-
-Run engineering only:
-
-```bash
-python scripts/run_data_platform.py --dataset water_bodies --skip-ml
-```
-
-Run full assessment workflow (pipeline + scalability in sequence):
+## Main Run Commands (from repo root)
 
 ```bash
-python scripts/run_full_assessment.py
+# Full pipeline (engineering + ML)
+.venv/bin/python scripts/run_data_platform.py --dataset water_bodies --cv-parallelism 2
+
+# Scalability profiling outputs
+.venv/bin/python scripts/water_scalability_profiler.py --partitions 2,4,8 --fixed-rows 100000 --rows-per-partition 30000
+
+# Old vs new processing runtime comparison
+.venv/bin/python scripts/water_pipeline_compare_modes.py --mode both --output-dir . --config config/spark_config.yaml
 ```
 
-Run scalability analysis:
+If using a direct data resource URL:
+- add `--water-resource-url "<direct_url>"` to `run_data_platform.py`
+- add `--resource-url "<direct_url>"` to `water_pipeline_compare_modes.py`
 
-```bash
-python scripts/water_scalability_profiler.py --partitions 2,4,8 --fixed-rows 100000 --rows-per-partition 30000
-```
-
-Compare old vs new Spark implementation (same data/task):
-
-```bash
-python scripts/water_pipeline_compare_modes.py --mode both
-```
-
-Comparison outputs:
+## Key Outputs
+- `reports/water_bodies/mllib_model_comparison.csv`
+- `reports/water_bodies/sklearn_baseline.csv`
+- `reports/water_bodies/split_class_distribution.csv`
+- `reports/water_bodies/scaling_strong.csv`
+- `reports/water_bodies/scaling_weak.csv`
+- `reports/water_bodies/scaling_cost_performance.csv`
 - `reports/water_bodies/comparison/comparison_runtime.csv`
-- `reports/water_bodies/comparison/old/plan_transform.txt`
-- `reports/water_bodies/comparison/new/plan_transform.txt`
-- `reports/water_bodies/comparison/old/*.csv`
-- `reports/water_bodies/comparison/new/*.csv`
 
-If Data.gov resource auto-resolution fails, use direct resource URL:
-
+## Testing
 ```bash
-python scripts/run_data_platform.py --dataset water_bodies --water-resource-url "<direct_csv_or_geojson_url>"
+PYTHONPATH=. .venv/bin/pytest -q
 ```
-
-## Output Reports
-
-Primary reports in `reports/water_bodies/`:
-- `summary_totals.csv`
-- `dataset_profile.csv`
-- `ingestion_validation.csv`
-- `null_profile_top20.csv`
-- `column_inventory.csv`
-- `numeric_statistics.csv`
-- `top_values_by_column.csv`
-- `geometry_distribution.csv` (if geometry present)
-- `sample_records.csv`
-- `executive_summary.md`
-- `engineering_notes.md`
-- `pipeline_lineage.jsonl`
-
-ML reports in `reports/water_bodies/`:
-- `mllib_model_comparison.csv`
-- `sklearn_baseline.csv`
-- `feature_importance_index.csv` (for tree models)
-- `split_class_distribution.csv`
-
-Scalability reports in `reports/water_bodies/`:
-- `scaling_strong.csv`
-- `scaling_weak.csv`
-- `scaling_cost_performance.csv`
-- `bottleneck_analysis.json`
-
-Model artifacts in `data/models/water_bodies/`:
-- `*_spark_model/`
-- `sklearn_baseline.pkl`
-
-## Tableau
-
-- Build instructions: `tableau/WATER_BODIES_4_DASHBOARDS.md`
-- General notes: `tableau/README_tableau.md`
-
-## Coverage Mapping
-
-- Full requirement mapping: `docs/REQUIREMENT_COVERAGE.md`
