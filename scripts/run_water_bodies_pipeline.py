@@ -367,16 +367,33 @@ def prepare_ml_data(curated_df: DataFrame) -> tuple[DataFrame, list[str], list[s
         "label",
         "event_order",
     }
-    feature_candidates = [c for c in curated_df.columns if c not in leakage_cols]
+
+    # Build label from a dedicated subset of fields and block those fields from model features.
+    base_cols = [c for c in curated_df.columns if c not in leakage_cols]
+    label_basis_candidates = [c for c in base_cols if not c.lower().endswith("id")]
+    if not label_basis_candidates:
+        label_basis_candidates = base_cols
+    label_basis_count = max(1, min(4, len(label_basis_candidates) // 2 or 1))
+    label_basis_cols = sorted(label_basis_candidates)[:label_basis_count]
+
+    checks = [
+        F.when(F.col(c).isNull() | (F.trim(F.col(c).cast("string")) == ""), F.lit(0.0)).otherwise(F.lit(1.0))
+        for c in label_basis_cols
+    ]
+    label_non_empty = checks[0]
+    for expr in checks[1:]:
+        label_non_empty = label_non_empty + expr
+
+    labeled = curated_df.withColumn("label_basis_ratio", label_non_empty / F.lit(float(len(label_basis_cols))))
+    q = labeled.approxQuantile("label_basis_ratio", [0.15], 0.01)
+    threshold = q[0] if q else 0.6
+    labeled = labeled.withColumn("label", F.when(F.col("label_basis_ratio") <= F.lit(threshold), 1.0).otherwise(0.0))
+    labeled = labeled.withColumn("event_order", F.monotonically_increasing_id())
+    labeled = labeled.drop("label_basis_ratio")
+
+    feature_candidates = [c for c in curated_df.columns if c not in leakage_cols and c not in set(label_basis_cols)]
     feature_candidates = [c for c in feature_candidates if "quality" not in c.lower() and "completeness" not in c.lower()]
     feature_candidates = [c for c in feature_candidates if not c.lower().endswith("id")]
-
-    # Imbalanced label: lowest ~15% completeness considered high-risk quality issue.
-    q = curated_df.approxQuantile("completeness_ratio", [0.15], 0.01)
-    threshold = q[0] if q else 0.6
-
-    labeled = curated_df.withColumn("label", F.when(F.col("completeness_ratio") <= F.lit(threshold), 1.0).otherwise(0.0))
-    labeled = labeled.withColumn("event_order", F.monotonically_increasing_id())
 
     # Leakage guard: keep columns that are mostly non-missing so label-by-missingness is harder to memorize.
     if feature_candidates:

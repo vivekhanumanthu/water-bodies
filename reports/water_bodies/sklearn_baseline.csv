@@ -1,2 +1,2 @@
-model,roc_auc_train_sample,rows
-sklearn_logistic,1.0,15103
+model,roc_auc_train_sample,roc_auc_test_sample,train_rows,test_rows
+sklearn_logistic,0.6749371742720518,0.6674403862595599,10572,2266
